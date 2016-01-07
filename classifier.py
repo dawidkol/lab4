@@ -1,4 +1,5 @@
 ﻿##  Wzorowane na przykładzie Rona Zacharskiego
+import numpy
 
 class Classifier:
 
@@ -35,26 +36,39 @@ class Classifier:
 
     def getMedian(self, alist):
         """TODO: zwraca medianę listy"""
+#posortuj rosnąco
+        return numpy.median(alist)
 
-        return 0
         
 
     def getAbsoluteStandardDeviation(self, alist, median):
         """TODO: zwraca absolutne odchylenie standardowe listy od mediany"""
-        return 0
+        suma=0
+        for i in range(len(alist)):
+            suma=suma+abs(alist[i]-median)
+
+        return suma/len(alist)
 
     def normalizeColumn(self, columnNumber):
-        """TODO: 
-        1. mając dany nr kolumny w self.data, dokonuje normalizacji wg Modified Standard Score
-        2. zapisz medianę i odchylenie standardowe dla kolumny w self.medianAndDeviation"""
-
+        """TODO: mając dany nr kolumny w self.data, dokonuje normalizacji wg Modified Standard Score"""
+        a=[]
+        for i in range (self.vlen):
+            a.append(self.data[i][1][columnNumber])
+        mediana=self.getMedian(a)
+        odch=self.getAbsoluteStandardDeviation(a,mediana)
+        self.medianAndDeviation.append((mediana, odch))
+        for i in self.data:
+            i[1][columnNumber]=(i[1][columnNumber]-mediana)/(odch)
         pass
-        
+
     def normalizeVector(self, v):
         """Znormalizuj podany wektor mając daną medianę i odchylenie standardowe dla każdej kolumny"""
         vector = list(v)
-        # TODO: wpisz kod
+        for i in vector:
+            (mediana, odchylenie)=self.medianAndDeviation[i]
+            vector[i]=(vector[i]-mediana)/odchylenie
         return vector
+
 
     def manhattan(self, vector1, vector2):
         """Zwraca odległość Manhattan między dwoma wektorami cech."""
@@ -64,7 +78,7 @@ class Classifier:
     def nearestNeighbor(self, itemVector):
         """return nearest neighbor to itemVector"""
         
-        return ((0, ("TODO: Zwróc najbliższego sąsiada", [0], [])))
+        return min([(self.manhattan(itemVector, i[1]), i) for i in self.data])
     
     def classify(self, itemVector):
         """Return class we think item Vector is in"""
@@ -193,6 +207,6 @@ def test(training_filename, test_filename):
 #  test("mpgTrainingSet.txt", "mpgTestSet.txt")
 
 testMedianAndASD()
-# testNormalization()
+#testNormalization()
 # testClassifier()
 
